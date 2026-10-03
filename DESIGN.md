@@ -2,8 +2,8 @@
 
 <!-- impeccable:design-schema 1 -->
 
-The supplied Figma design establishes a dark midnight navy page with crisp white uppercase headings, electric blue actions, and restrained blue-black panels. Keep a wide editorial layout, subtle circuit and signal imagery, and compact navigation. Use the supplied eagle logo as the unmistakable visual anchor.
+The redesign uses a full-viewport neural field over deep ink blue, white and ice-blue typography, and a luminous procedural 3D signal sculpture. The supplied eagle is rendered directly and crisply in the navigation and footer. Large, condensed display type gives the content its shape; thin rules organize subject and event rows without card grids.
 
-Motion should feel like electrical activity: neural filaments in the hero, particles in the mark, a magnetic pointer response, and a draggable gallery. Keep text still and readable. On touch devices and with reduced motion, present a coherent static composition.
+The global cursor leaves a smooth light trail on fine-pointer devices. The neural field stays behind all content. The 3D sculpture occupies the hero background and responds gently to pointer movement. Reduced-motion users receive static versions of these effects, and touch users keep the normal pointer behavior.
 
-The homepage is a persuasive and exploratory surface. It begins with the society identity and moves through technology updates, career insights, student achievements, events, and contact.
+The homepage moves from a clear invitation to events through the society's areas of interest and community work. The event page keeps the same world, then places event choices beside a straightforward registration form with clear loading, error, and saved states.

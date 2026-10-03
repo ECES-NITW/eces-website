@@ -5,10 +5,11 @@ import "@fontsource/barlow/600.css";
 import "@fontsource/barlow-condensed/600.css";
 import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
+import { SiteShell } from "@/components/site-shell";
 
 export const metadata: Metadata = {
   title: "ECE Society | NIT Warangal",
-  description: "Explore technology updates, student achievements, career insights, and events from the ECE Society at NIT Warangal.",
+  description: "Explore ideas and register for ECE Society events at NIT Warangal.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -22,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><SiteShell>{children}</SiteShell></body>
     </html>
   );
 }
