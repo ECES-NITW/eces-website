@@ -17,7 +17,7 @@ An ECE Society homepage that introduces the society and lets visitors explore up
 ## Capabilities and Constraints
 - Responsive homepage following the supplied Figma design.
 - Include the supplied ECE Society logo.
-- Incorporate Pixel Magnet, Particle Image, Infinite Gallery, and Neural Flash effects. Exact licensed React Bits registry packages need a license key; integration is pending that access.
+- Incorporate custom equivalents of Pixel Magnet, Particle Image, Infinite Gallery, and Neural Flash effects, as chosen by the user because the licensed registry key was unavailable.
 - No live content service, event registration system, or verified contact details were supplied.
 
 ## Brand Commitments
