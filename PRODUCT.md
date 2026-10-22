@@ -19,8 +19,9 @@ An ECE Society homepage that introduces the society and lets visitors explore up
 - Include the supplied ECE Society logo.
 - Place Neural Flash across the page background, show an animated 3D signal sculpture, and use a smooth cursor trail. Keep the logo sharp without particle treatment.
 - Explore Events opens a separate event registration page.
-- Registration uses Cloudflare D1 on its free tier and collects name, email, and phone, with a contact consent checkbox. The three current event categories are temporary sign-up options until real event details are supplied.
-- Entry year and department code are extracted when a `student.nitw.ac.in` address contains a recognizable roll number. Section stays blank until its encoding is confirmed.
+- Registration uses Cloudflare D1 on its free tier and collects name, roll number (stored as text), and phone. No email or contact consent is collected; details are used only for the event itself. One registration per roll number per event.
+- Events live in D1 and are managed at `/admin` (create, edit, open/close registration, hide, delete when empty). Registrations are viewed and exported as CSV at `/admin/registrations`. The admin area has no authentication yet; it must be added before publishing. The three seeded event categories are placeholders until real event details are supplied.
+- Entry year and department code are extracted when the roll number matches the NITW format (e.g. 23ECB0A12). Section stays blank until its encoding is confirmed.
 - Avoid paid hosting and paid server services. A custom domain may be added later.
 
 ## Brand Commitments
