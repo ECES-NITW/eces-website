@@ -8,6 +8,27 @@
       "when": 1791010698450,
       "tag": "0000_funny_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792685795856,
+      "tag": "0001_sad_talon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792686952533,
+      "tag": "0002_brainy_micromacro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792686959341,
+      "tag": "0003_shocking_roulette",
+      "breakpoints": true
     }
   ]
 }

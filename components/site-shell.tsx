@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
+import { socialLinks } from "@/lib/social-links";
 import { CursorTail, NeuralBackground } from "./site-effects";
+import { SocialIcon } from "./social-icon";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -27,6 +29,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <footer className="main-footer">
         <a className="footer-logo" href="/"><img src="/ece-logo.png" alt="" /><span>ECE Society<br />NIT Warangal</span></a>
         <p>Ideas move further when we build them together.</p>
+        <nav className="footer-social" aria-label="ECE Society on social media">{socialLinks.map(link => <a key={link.id} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} (opens in a new tab)`} title={link.label}><SocialIcon id={link.id} /></a>)}</nav>
         <a href="/events">Explore events <ArrowUpRight size={14} /></a>
       </footer>
     </div>
