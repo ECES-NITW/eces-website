@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const events = sqliteTable("events", {
   // The slug is fixed once created because registrations refer to it.
@@ -35,3 +35,32 @@ export const eventRegistrations = sqliteTable(
   },
   (table) => [uniqueIndex("event_registrations_event_roll_number_unique").on(table.eventSlug, table.rollNumber)],
 );
+
+export const organizerInvites = sqliteTable("organizer_invites", {
+  tokenHash: text("token_hash").primaryKey(),
+  email: text("email").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});
+
+export const organizerPasskeys = sqliteTable("organizer_passkeys", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull(),
+  userHandle: text("user_handle").notNull(),
+  publicKey: text("public_key").notNull(),
+  counter: integer("counter").notNull(),
+});
+
+export const organizerChallenges = sqliteTable("organizer_challenges", {
+  id: text("id").primaryKey(),
+  challenge: text("challenge").notNull(),
+  inviteHash: text("invite_hash"),
+  userHandle: text("user_handle"),
+  expiresAt: integer("expires_at").notNull(),
+}, (table) => [index("organizer_challenges_expires").on(table.expiresAt)]);
+
+export const organizerSessions = sqliteTable("organizer_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  passkeyId: text("passkey_id").notNull()
+    .references(() => organizerPasskeys.id, { onDelete: "cascade" }),
+  expiresAt: integer("expires_at").notNull(),
+}, (table) => [index("organizer_sessions_expires").on(table.expiresAt)]);

@@ -29,6 +29,13 @@
       "when": 1792686959341,
       "tag": "0003_shocking_roulette",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794831022338,
+      "tag": "0004_organizer_passkeys",
+      "breakpoints": true
     }
   ]
 }

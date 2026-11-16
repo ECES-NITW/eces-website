@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eces-website",
+  "account_id": "77740a0c165b8e8f175234ee03731fe5",
+  "main": "./build/sites-worker.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "keep_vars": true,
+  "vars": {
+    "ORGANIZER_ORIGIN": "https://www.ecesnitw.in"
+  },
+  "ratelimits": [
+    {
+      "name": "ORGANIZER_RATE_LIMIT",
+      "namespace_id": "11261601",
+      "simple": { "limit": 20, "period": 60 }
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "eces-website-production",
+      "database_id": "45a93c2e-1689-40e6-a670-c6f4d9b8b30e",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "eces-website-preview",
+        "database_id": "834964d5-b78b-49c9-adc7-2923813dc56a"
+      }
+    ]
+  }
+}

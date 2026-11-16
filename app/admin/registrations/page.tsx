@@ -1,5 +1,8 @@
 import { Download } from "lucide-react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { listEvents, registrationCounts } from "@/lib/events";
+import { hasOrganizerAccess } from "@/lib/organizer-access";
 import { listRegistrations } from "@/lib/registrations";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +18,7 @@ async function load(filter?: string) {
 }
 
 export default async function AdminRegistrationsPage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
+  if (!(await hasOrganizerAccess(await headers()))) redirect("/organizer");
   const { event: filter } = await searchParams;
   const data = await load(filter);
   if (!data) return <p className="form-error" role="alert">Couldn&apos;t load registrations from the database. Check that the migrations have been applied.</p>;
