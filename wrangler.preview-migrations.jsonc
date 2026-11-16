@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "account_id": "77740a0c165b8e8f175234ee03731fe5",
+  "d1_databases": [
+    {
+      "binding": "PREVIEW_DB",
+      "database_name": "eces-website-preview",
+      "database_id": "834964d5-b78b-49c9-adc7-2923813dc56a",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

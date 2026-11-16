@@ -1,6 +1,5 @@
 import { listRegistrations } from "@/lib/registrations";
-
-// TODO(auth): see app/api/admin/events/route.ts.
+import { hasOrganizerAccess, organizerAccessDenied } from "@/lib/organizer-access";
 
 function csvCell(value: string | null) {
   let text = value ?? "";
@@ -10,6 +9,7 @@ function csvCell(value: string | null) {
 }
 
 export async function GET(request: Request) {
+  if (!(await hasOrganizerAccess(request.headers))) return organizerAccessDenied();
   try {
     const eventSlug = new URL(request.url).searchParams.get("event") || undefined;
     const rows = await listRegistrations(eventSlug);

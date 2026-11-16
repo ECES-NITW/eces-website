@@ -3,10 +3,10 @@ import { getDb } from "@/db";
 import { events } from "@/db/schema";
 import { parseEventInput, slugify } from "@/lib/event-format";
 import { findEvent } from "@/lib/events";
-
-// TODO(auth): /api/admin/* and /admin are currently open to anyone; add organiser authentication before publishing.
+import { hasOrganizerAccess, isOrganizerOrigin, organizerAccessDenied } from "@/lib/organizer-access";
 
 export async function POST(request: Request) {
+  if (!isOrganizerOrigin(request) || !(await hasOrganizerAccess(request.headers))) return organizerAccessDenied();
   try {
     const parsed = parseEventInput((await request.json()) as Record<string, unknown>);
     if ("error" in parsed) return Response.json({ error: parsed.error }, { status: 400 });

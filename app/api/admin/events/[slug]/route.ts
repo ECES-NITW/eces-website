@@ -3,12 +3,12 @@ import { getDb } from "@/db";
 import { eventRegistrations, events } from "@/db/schema";
 import { parseEventInput } from "@/lib/event-format";
 import { findEvent } from "@/lib/events";
-
-// TODO(auth): see app/api/admin/events/route.ts.
+import { hasOrganizerAccess, isOrganizerOrigin, organizerAccessDenied } from "@/lib/organizer-access";
 
 type Context = { params: Promise<{ slug: string }> };
 
 export async function PATCH(request: Request, { params }: Context) {
+  if (!isOrganizerOrigin(request) || !(await hasOrganizerAccess(request.headers))) return organizerAccessDenied();
   try {
     const { slug } = await params;
     if (!(await findEvent(slug))) return Response.json({ error: "That event no longer exists." }, { status: 404 });
@@ -28,7 +28,8 @@ export async function PATCH(request: Request, { params }: Context) {
   }
 }
 
-export async function DELETE(_request: Request, { params }: Context) {
+export async function DELETE(request: Request, { params }: Context) {
+  if (!isOrganizerOrigin(request) || !(await hasOrganizerAccess(request.headers))) return organizerAccessDenied();
   try {
     const { slug } = await params;
     const db = getDb();
