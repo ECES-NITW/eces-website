@@ -7,6 +7,7 @@ import { SocialIcon } from "@/components/social-icon";
 import { about } from "@/lib/about";
 import { describeEventWhen } from "@/lib/event-format";
 import { listEvents, type EventRecord } from "@/lib/events";
+import { plannedRoadmapSections } from "@/lib/roadmap-sections";
 import { roadmapTracks } from "@/lib/roadmaps";
 import { getSection, siteSections, type SiteSectionId } from "@/lib/site-sections";
 import { socialLinks } from "@/lib/social-links";
@@ -115,6 +116,21 @@ const seniorMembers = teamGroups
   .slice(0, 5);
 const memberCount = teamGroups.reduce((total, group) => total + group.members.length, 0);
 
+// Roadmaps glimpse: the tracks that exist in lib/roadmaps.ts, then planned sections from
+// lib/roadmap-sections.ts that don't have a track yet.
+const roadmapRows = [
+  ...roadmapTracks.map((track, index) => ({
+    id: track.id as string,
+    kicker: `Track ${String(index + 1).padStart(2, "0")}`,
+    label: track.label,
+    covers: track.topics.map(topic => topic.title).join(" / "),
+    blurb: track.blurb,
+  })),
+  ...plannedRoadmapSections
+    .filter(section => !roadmapTracks.some(track => track.id === section.id))
+    .map(section => ({ id: section.id, kicker: "Coming soon", label: section.label, covers: section.covers, blurb: section.blurb })),
+];
+
 export default async function Home() {
   const events = pickEvents(await loadEvents());
   return <main>
@@ -180,20 +196,14 @@ export default async function Home() {
         <Kicker id="roadmaps" />
         <div className="section-topline"><h2 id="roadmaps-title">Know where to start.</h2><p>{getSection("roadmaps").blurb}</p></div>
         <div className={styles.trackList}>
-          {roadmapTracks.map((track, index) => (
-            <a key={track.id} href="/roadmaps" className={styles.trackRow}>
-              <span>Track {String(index + 1).padStart(2, "0")}</span>
-              <h3>{track.label}</h3>
-              <span className={styles.trackNote}>{track.topics.map(topic => topic.title).join(" / ")}<small>{track.blurb}</small></span>
+          {roadmapRows.map(row => (
+            <a key={row.id} href="/roadmaps" className={styles.trackRow}>
+              <span>{row.kicker}</span>
+              <h3>{row.label}</h3>
+              <span className={styles.trackNote}>{row.covers}<small>{row.blurb}</small></span>
               <ArrowUpRight size={24} strokeWidth={1.5} aria-hidden="true" />
             </a>
           ))}
-          <a href="/roadmaps" className={styles.trackRow}>
-            <span>Coming soon</span>
-            <h3>PYQs &amp; textbooks</h3>
-            <span className={styles.trackNote}>Previous years&apos; question papers and textbooks<small>Collected in one place for ECE courses.</small></span>
-            <ArrowUpRight size={24} strokeWidth={1.5} aria-hidden="true" />
-          </a>
         </div>
         <a className="home-event-cta" href="/roadmaps">Open the roadmaps <ArrowUpRight size={18} /></a>
       </Reveal>

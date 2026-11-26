@@ -64,7 +64,7 @@ export const siteSections: readonly SiteSection[] = [
     label: "Roadmaps",
     href: "/roadmaps",
     title: "Roadmaps",
-    blurb: "Learning roadmaps for software and hardware, with resources to start from.",
+    blurb: "Learning roadmaps for software and hardware, and academic resources for ECE courses.",
     ready: true,
   },
   {

@@ -65,7 +65,7 @@ section.whatsOn { padding-block: 120px 110px; }
 .trackRow { display: grid; grid-template-columns: 110px minmax(200px, 340px) 1fr 26px; gap: 20px; align-items: center; min-height: 128px; padding-block: 18px; border-bottom: 1px solid var(--line); transition: transform .25s, background .25s; }
 .trackRow:hover { transform: translateX(7px); background: rgba(60, 148, 246, .1); }
 .trackRow > span:first-child { color: #9ddaff; text-transform: uppercase; font-weight: 600; font-size: 12px; letter-spacing: .09em; }
-.trackRow h3 { font-size: clamp(31px, 3vw, 45px); font-weight: 600; text-transform: uppercase; margin: 0; }
+.trackRow h3 { font-size: clamp(31px, 3vw, 45px); line-height: 1; font-weight: 600; text-transform: uppercase; margin: 0; }
 .trackNote { color: #d5e8f5; font-size: 15px; line-height: 1.45; }
 .trackNote small { display: block; color: #a9c4da; font-size: 12px; margin-top: 4px; }
 .trackRow svg { color: #94daff; }
