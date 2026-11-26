@@ -7,3 +7,5 @@ The redesign uses a full-viewport neural field over deep ink blue, white and ice
 The global cursor leaves a smooth light trail on fine-pointer devices. The neural field stays behind all content. The 3D sculpture occupies the hero background and responds gently to pointer movement. Reduced-motion users receive static versions of these effects, and touch users keep the normal pointer behavior.
 
 The homepage moves from a clear invitation to events through the society's areas of interest and community work. The event page keeps the same world, then places event choices beside a straightforward registration form with clear loading, error, and saved states.
+
+Use the [Electronics Club, IIT Kanpur website](https://eclubiitk.in/) as a reference for organizing content and designing interactions. The Team page adopts its role-based roster, section navigation, and staggered portrait reveals, using the ECE Society palette, typography, and portraits.
