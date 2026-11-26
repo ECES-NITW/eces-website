@@ -22,6 +22,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <nav className={open ? "main-nav open" : "main-nav"} aria-label="Main navigation">
           <a href="/#explore" onClick={() => setOpen(false)}>Explore</a>
           <a href="/#community" onClick={() => setOpen(false)}>Community</a>
+          <a href="/roadmaps" onClick={() => setOpen(false)}>Roadmaps</a>
           <a href="/team" aria-current={pathname === "/team" ? "page" : undefined} onClick={() => setOpen(false)}>Team</a>
           <a href="/events" onClick={() => setOpen(false)}>Events</a>
         </nav>
@@ -33,7 +34,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <a className="footer-logo" href="/"><img src="/ece-logo.png" alt="" /><span>ECE Society<br />NIT Warangal</span></a>
         <p>Ideas move further when we build them together.</p>
         <nav className="footer-social" aria-label="ECE Society on social media">{socialLinks.map(link => <a key={link.id} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} (opens in a new tab)`} title={link.label}><SocialIcon id={link.id} /></a>)}</nav>
-        <a href="/events">Explore events <ArrowUpRight size={14} /></a>
+        <nav className="footer-links" aria-label="Footer navigation">
+          <a href="/roadmaps">Roadmaps</a>
+          <a href="/events">Explore events <ArrowUpRight size={14} /></a>
+        </nav>
       </footer>
     </div>
   </>;
