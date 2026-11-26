@@ -83,6 +83,10 @@
   margin-top: clamp(54px, 8vw, 108px);
 }
 
+.featured + .group {
+  margin-top: clamp(48px, 6vw, 80px);
+}
+
 .groupHeading {
   display: flex;
   align-items: baseline;
@@ -244,12 +248,14 @@
 }
 
 .featured .grid {
-  grid-template-columns: minmax(0, 28rem);
+  grid-template-columns: minmax(0, 38rem);
+  justify-content: center;
 }
 
 .featured .member {
   display: grid;
-  grid-template-columns: minmax(6.5rem, 34%) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
+  border-bottom: 1px solid var(--line);
 }
 
 .featured .portrait img {
@@ -258,6 +264,13 @@
 
 .featured .memberInfo {
   justify-content: center;
+  gap: clamp(12px, 1.6vw, 18px);
+  padding-inline: clamp(12px, 3vw, 40px);
+  border-bottom: 0;
+}
+
+.featured .memberInfo h3 {
+  font-size: clamp(1.625rem, 3.6vw, 2.75rem);
 }
 
 .featured .contacts {
@@ -337,6 +350,14 @@
 @media (max-width: 365px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .featured .member {
+    display: flex;
+  }
+
+  .featured .portrait {
+    aspect-ratio: 5 / 4;
   }
 }
 
