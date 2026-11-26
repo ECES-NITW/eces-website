@@ -18,7 +18,6 @@ function MemberCard({ member, featured }: { member: TeamMember; featured: boolea
   const { name, email, portrait } = member;
   const nameParts = name.split(" ");
   const initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
-  const [mailbox, domain] = email.split("@");
 
   return (
     <article className={styles.member}>
@@ -40,11 +39,10 @@ function MemberCard({ member, featured }: { member: TeamMember; featured: boolea
       </div>
       <div className={styles.memberInfo}>
         <h3>{name}</h3>
-        <a className={styles.email} href={`mailto:${email}`} aria-label={`Email ${name} at ${email}`}>
-          <Mail size={17} aria-hidden="true" />
-          <span>{mailbox}@<wbr />{domain}</span>
-        </a>
-        <div className={styles.socials}>
+        <div className={styles.contacts}>
+          <a href={`mailto:${email}`} aria-label={`Email ${name}`} title={email}>
+            <Mail size={17} strokeWidth={1.5} aria-hidden="true" />
+          </a>
           {socialProfiles.map(({ id, label }) => {
             const href = member[id];
             return href ? (
