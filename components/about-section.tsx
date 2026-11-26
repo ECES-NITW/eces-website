@@ -6,9 +6,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { about } from "@/lib/about";
 import styles from "./about-section.module.css";
 
-// Facts still marked TODO(content) in lib/about.ts are null and stay hidden.
-const facts = about.facts.filter(fact => fact.value !== null);
-
 function scrollToAbout() {
   const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.getElementById("about")?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
@@ -80,13 +77,10 @@ export function AboutSection({ kicker }: { kicker: React.ReactNode }) {
       </div>
 
       <div className={styles.body}>
-        <p className={styles.lead}>{about.lead}</p>
         <p className={styles.summary}>{about.summary}</p>
-        {facts.length > 0 && (
-          <dl className={styles.facts}>
-            {facts.map(fact => <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
-          </dl>
-        )}
+        <ul className={styles.highlights} aria-label="ECES at a glance">
+          {about.highlights.map(point => <li key={point}>{point}</li>)}
+        </ul>
         <button
           type="button"
           className={styles.toggle}

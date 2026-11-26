@@ -3,12 +3,11 @@
 .head h2 { font-size: clamp(50px, 5.4vw, 84px); line-height: .94; letter-spacing: -.025em; text-transform: uppercase; margin: 0; }
 .head h2 em { font-style: normal; color: #9de4ff; }
 
-.lead { color: var(--cyan); font: 600 clamp(26px, 2.4vw, 34px)/1.05 "Barlow Condensed", sans-serif; text-transform: uppercase; letter-spacing: .005em; margin: 0 0 16px; }
-.summary { color: #cee2f1; font-size: 17px; line-height: 1.6; margin: 0 0 28px; max-width: 470px; }
+.summary { color: #cee2f1; font-size: 17px; line-height: 1.6; margin: 0 0 26px; max-width: 480px; }
 
-.facts { display: flex; flex-wrap: wrap; gap: 18px 40px; margin: 0 0 32px; border-left: 1px solid #6bb9f0; padding-left: 22px; }
-.facts dt { color: #86cfff; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
-.facts dd { margin: 6px 0 0; font: 600 20px/1.1 "Barlow Condensed", sans-serif; text-transform: uppercase; }
+.highlights { list-style: none; margin: 0 0 32px; padding: 0; max-width: 480px; border-top: 1px solid rgba(132, 194, 248, .18); }
+.highlights li { position: relative; padding: 12px 0 12px 24px; border-bottom: 1px solid rgba(132, 194, 248, .18); color: #e1eff8; font-size: 15px; line-height: 1.4; }
+.highlights li::before { content: ""; position: absolute; left: 2px; top: 19px; width: 8px; height: 8px; border: 1px solid var(--cyan); box-shadow: 0 0 8px rgba(144, 226, 255, .45); }
 
 .toggle { display: inline-flex; align-items: center; gap: 16px; padding: 15px 18px; border: 1px solid #7ccfff; background: transparent; color: #dbf5ff; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; transition: background .2s, color .2s; }
 .toggle:hover { background: #a6eaff; color: #041328; }
@@ -20,7 +19,7 @@
 .part:last-child { padding-bottom: 4px; }
 .part h3 { color: #9ddaff; font: 600 12px/1 "Barlow", sans-serif; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 22px; }
 
-.whoWeAre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.whoWeAre { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1060px; }
 .whoWeAre p { color: #c7ddec; font-size: 15px; line-height: 1.65; margin: 0; }
 
 .pillars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
