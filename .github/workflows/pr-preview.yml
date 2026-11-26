@@ -1,17 +1,27 @@
-name: Exercise the preview workflow
+name: Generate PR preview
+run-name: Generate preview for PR #${{ inputs.pr }}
+
 on:
-  push:
-    branches: [codex/reviewer-previews]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Open pull request number
+        required: true
+        type: string
+      reviewed_sha:
+        description: Full SHA of the pull request head you reviewed
+        required: true
+        type: string
 
 permissions: {}
 
 concurrency:
-  group: pr-preview-smoke
+  group: pr-preview-${{ inputs.pr }}
   cancel-in-progress: false
 
 jobs:
   preview:
-    if: github.ref == 'refs/heads/codex/reviewer-previews'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -22,8 +32,8 @@ jobs:
       - name: Request the Cloudflare build and share the preview
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: "3"
-          REVIEWED_SHA: "6a7e714138fd70af6ba918fd0fa523d4e4946812"
+          PR_NUMBER: ${{ inputs.pr }}
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
         shell: bash
         run: |
           if [[ ! "$PR_NUMBER" =~ ^[1-9][0-9]{0,9}$ || ! "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
@@ -60,7 +70,7 @@ jobs:
           git push origin "$REVIEWED_SHA:$ref"
 
           # A commit can be on several branches. Only accept the build for this preview branch.
-          until=$((SECONDS + 150))
+          until=$((SECONDS + 1260))
           build=''
           while (( SECONDS < until )); do
             build=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$REVIEWED_SHA/check-runs?per_page=100" |
@@ -90,4 +100,4 @@ jobs:
           printf '### Cloudflare preview\n\n[Open preview](%s) for commit `%s`. [Build details](%s)\n' \
             "$preview_url" "$REVIEWED_SHA" "$build_url" > "$RUNNER_TEMP/preview-comment.md"
           cat "$RUNNER_TEMP/preview-comment.md" >> "$GITHUB_STEP_SUMMARY"
-          cat "$RUNNER_TEMP/preview-comment.md"
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/preview-comment.md"
