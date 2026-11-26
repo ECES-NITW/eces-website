@@ -81,7 +81,7 @@ export const siteSections: readonly SiteSection[] = [
     href: "/about",
     title: "About",
     blurb: "Who we are, what we do, and how to get involved.",
-    ready: false,
+    ready: true,
   },
 ];
 

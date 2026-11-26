@@ -1,0 +1,66 @@
+.page { width: min(1220px, calc(100% - 68px)); margin: auto; padding-bottom: 150px; }
+
+.intro { position: relative; isolation: isolate; padding: 35px 0 70px; border-bottom: 1px solid var(--line); }
+.mark { position: absolute; right: -4vw; top: 40px; font: 700 clamp(180px, 26vw, 420px)/.8 "Barlow Condensed", sans-serif; letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 1px rgba(108, 182, 250, .13); pointer-events: none; z-index: -1; }
+.back { display: inline-flex; align-items: center; gap: 10px; color: #c2ddef; font-size: 13px; margin-bottom: 60px; }
+.back:hover { color: #9ce6ff; }
+.introGrid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 60px; align-items: end; }
+.kicker { color: #86cfff; font-size: 11px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; margin: 0 0 20px; }
+.intro h1 { font-size: clamp(58px, 6.6vw, 104px); line-height: .9; letter-spacing: -.026em; text-transform: uppercase; margin: 0 0 28px; }
+.intro h1 span { color: #a7e7ff; }
+.summary { max-width: 620px; color: #cee2f1; font-size: 17px; line-height: 1.6; margin: 0; }
+.facts { margin: 0; border-left: 1px solid #6bb9f0; padding-left: 23px; }
+.facts div + div { margin-top: 18px; }
+.facts dt { color: #86cfff; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+.facts dd { margin: 6px 0 0; font: 600 22px/1.1 "Barlow Condensed", sans-serif; text-transform: uppercase; }
+
+.split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 60px; padding: 90px 0; border-bottom: 1px solid var(--line); }
+.split h2, .block h2 { font-size: clamp(46px, 5vw, 72px); line-height: .95; letter-spacing: -.022em; text-transform: uppercase; margin: 0; }
+.prose p { color: #c7ddec; font-size: 16px; line-height: 1.7; margin: 0 0 18px; max-width: 640px; }
+.prose p:last-child { margin-bottom: 0; }
+
+.block { padding-top: 90px; }
+.block h2 { margin-bottom: 36px; }
+
+.pillars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+.pillars li { padding: 28px 24px 30px 0; border-bottom: 1px solid var(--line); }
+.pillars li + li { padding-left: 24px; border-left: 1px solid var(--line); }
+.pillars span { color: #86cfff; font: 12px/1 ui-monospace, Consolas, monospace; letter-spacing: .12em; }
+.pillars h3 { font-size: 30px; line-height: 1; text-transform: uppercase; font-weight: 600; margin: 18px 0 12px; }
+.pillars p { color: #bed4e6; font-size: 14px; line-height: 1.5; margin: 0; }
+
+.rows { border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: minmax(200px, 320px) 1fr 26px; gap: 24px; align-items: center; min-height: 116px; padding-block: 18px; border-bottom: 1px solid var(--line); transition: transform .25s, background .25s; }
+.row:hover { transform: translateX(7px); background: rgba(60, 148, 246, .1); }
+.row h3 { display: inline-flex; align-items: center; gap: 12px; font-size: clamp(31px, 3vw, 42px); font-weight: 600; text-transform: uppercase; margin: 0; }
+.row p { color: #c7ddec; font-size: 15px; line-height: 1.5; margin: 0; }
+.row small { display: block; color: #a9c4da; font-size: 12px; margin-top: 4px; }
+.row svg { color: #94daff; }
+
+.email { display: inline-flex; align-items: center; gap: 14px; margin-top: 32px; padding: 16px 20px; color: #061528; background: #a5e7ff; font-weight: 700; font-size: 13px; letter-spacing: .04em; transition: background .2s; }
+.email:hover { background: #d2f4ff; }
+
+@media (max-width: 900px) {
+  .page { width: calc(100% - 40px); }
+  .introGrid, .split { grid-template-columns: 1fr; gap: 34px; }
+  .pillars { grid-template-columns: repeat(2, 1fr); }
+  .pillars li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .row { grid-template-columns: 200px 1fr 25px; }
+}
+
+@media (max-width: 640px) {
+  .page { width: calc(100% - 34px); padding-bottom: 110px; }
+  .intro { padding: 25px 0 50px; }
+  .back { margin-bottom: 40px; }
+  .intro h1 { font-size: clamp(40px, 11.5vw, 60px); }
+  .summary { font-size: 15px; }
+  .split { padding: 70px 0; }
+  .block { padding-top: 70px; }
+  .split h2, .block h2 { font-size: 46px; }
+  .pillars { grid-template-columns: 1fr; }
+  .pillars li, .pillars li + li { padding: 22px 0; border-left: 0; }
+  .row { grid-template-columns: 1fr 25px; gap: 6px 12px; min-height: 0; padding-block: 20px; }
+  .row h3 { grid-column: 1; font-size: 30px; }
+  .row p { grid-column: 1; font-size: 14px; }
+  .row svg { grid-column: 2; grid-row: 1 / 3; }
+}
