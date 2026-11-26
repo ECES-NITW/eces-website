@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Camera } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Camera, Mail } from "lucide-react";
 import DecryptedText from "@/components/react-bits/decrypted-text";
 import SpotlightCard from "@/components/react-bits/spotlight-card";
 import { Reveal } from "@/components/reveal";
@@ -116,6 +116,9 @@ const seniorMembers = teamGroups
   .slice(0, 5);
 const memberCount = teamGroups.reduce((total, group) => total + group.members.length, 0);
 
+// Facts still marked TODO(content) in lib/about.ts are null and stay hidden.
+const aboutFacts = about.facts.filter(fact => fact.value !== null);
+
 // Roadmaps glimpse: the tracks that exist in lib/roadmaps.ts, then planned sections from
 // lib/roadmap-sections.ts that don't have a track yet.
 const roadmapRows = [
@@ -209,7 +212,7 @@ export default async function Home() {
       </Reveal>
     </section>
 
-    <section className={styles.about} aria-labelledby="about-title">
+    <section className={styles.about} id="about" aria-labelledby="about-title">
       <div className={styles.aboutMark} aria-hidden="true">ECES</div>
       <Reveal className={styles.aboutInner}>
         <div className={styles.aboutHead}>
@@ -217,21 +220,34 @@ export default async function Home() {
           <h2 id="about-title">{about.heading.first}<br /><em>{about.heading.second}</em></h2>
         </div>
         <div className={styles.aboutBody}>
-          <p>{about.homeSummary}</p>
-          <a className="action-primary" href="/about">More about the society <ArrowUpRight size={18} /></a>
+          <p>{about.summary}</p>
+          <dl className={styles.facts}>
+            {aboutFacts.map(fact => <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
+          </dl>
         </div>
-        <ol className={styles.pillars}>
-          {about.pillars.map((pillar, index) => (
-            <li key={pillar.title}><span>{String(index + 1).padStart(2, "0")}</span>{pillar.title}</li>
-          ))}
-        </ol>
+        <div className={styles.aboutPart}>
+          <h3>Who we are</h3>
+          <div className={styles.whoWeAre}>{about.whoWeAre.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+        </div>
+        <div className={styles.aboutPart}>
+          <h3>What we do</h3>
+          <ol className={styles.pillars}>
+            {about.pillars.map((pillar, index) => (
+              <li key={pillar.title}><span>{String(index + 1).padStart(2, "0")}</span><strong>{pillar.title}</strong><p>{pillar.line}</p></li>
+            ))}
+          </ol>
+        </div>
       </Reveal>
     </section>
 
     <section className={`connect-section ${styles.connect}`} id="connect" aria-labelledby="connect-title">
       <Reveal>
         <div className="section-topline"><h2 id="connect-title">Stay connected.</h2><p>Follow along for event announcements, recaps, and what the society is building next.</p></div>
-        <div className="home-event-list">{socialLinks.map(link => <a href={link.href} key={link.id} className="home-event-row connect-row" target="_blank" rel="noopener noreferrer"><span><SocialIcon id={link.id} size={18} /> {link.label}</span><h3>{link.handle}</h3><span className="event-row-note">{link.note}</span><ArrowUpRight size={24} strokeWidth={1.5} aria-hidden="true" /></a>)}</div>
+        <div className="home-event-list">
+          {socialLinks.map(link => <a href={link.href} key={link.id} className="home-event-row connect-row" target="_blank" rel="noopener noreferrer"><span><SocialIcon id={link.id} size={18} /> {link.label}</span><h3>{link.handle}</h3><span className="event-row-note">{link.note}</span><ArrowUpRight size={24} strokeWidth={1.5} aria-hidden="true" /></a>)}
+          {/* Shown once the society's public email is set in lib/about.ts. */}
+          {about.contactEmail && <a href={`mailto:${about.contactEmail}`} className="home-event-row connect-row"><span><Mail size={18} aria-hidden="true" /> Email</span><h3>{about.contactEmail}</h3><span className="event-row-note">Write to the society.</span><ArrowUpRight size={24} strokeWidth={1.5} aria-hidden="true" /></a>}
+        </div>
       </Reveal>
     </section>
   </main>;

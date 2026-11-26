@@ -73,14 +73,25 @@ section.whatsOn { padding-block: 120px 110px; }
 /* About block, with the outlined ECES lettering from the old Community section. */
 .about { position: relative; overflow: hidden; padding: 120px 0; background: radial-gradient(circle at 20% 45%, rgba(15, 66, 128, .58), rgba(4, 21, 48, .63) 50%, rgba(4, 13, 27, .86) 100%); border-block: 1px solid var(--line); }
 .aboutMark { position: absolute; left: -2vw; top: 50%; transform: translateY(-50%); font: 700 clamp(200px, 35vw, 540px)/.8 "Barlow Condensed", sans-serif; letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 1px rgba(108, 182, 250, .14); pointer-events: none; }
-.aboutInner { width: min(1220px, calc(100% - 68px)); margin: auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr .75fr; gap: 40px 75px; align-items: end; }
+.aboutInner { width: min(1220px, calc(100% - 68px)); margin: auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px 75px; align-items: end; }
 .aboutHead h2 { font-size: clamp(50px, 5.4vw, 84px); line-height: .94; letter-spacing: -.025em; text-transform: uppercase; margin: 0; }
 .aboutHead h2 em { font-style: normal; color: #9de4ff; }
-.aboutBody p { color: #cee2f1; font-size: 17px; line-height: 1.6; margin: 0 0 30px; max-width: 420px; }
-.pillars { grid-column: 1 / -1; list-style: none; margin: 30px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
-.pillars li { padding: 26px 20px 0 0; color: #dcecf7; font: 600 22px/1.05 "Barlow Condensed", sans-serif; text-transform: uppercase; letter-spacing: .01em; }
+.aboutBody > p { color: #cee2f1; font-size: 17px; line-height: 1.6; margin: 0 0 28px; max-width: 460px; }
+.facts { display: flex; flex-wrap: wrap; gap: 18px 40px; margin: 0; border-left: 1px solid #6bb9f0; padding-left: 22px; }
+.facts dt { color: #86cfff; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+.facts dd { margin: 6px 0 0; font: 600 20px/1.1 "Barlow Condensed", sans-serif; text-transform: uppercase; }
+
+.aboutPart { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 26px; margin-top: 20px; }
+.aboutPart h3 { color: #9ddaff; font: 600 12px/1 "Barlow", sans-serif; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 22px; }
+.whoWeAre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.whoWeAre p { color: #c7ddec; font-size: 15px; line-height: 1.65; margin: 0; }
+
+.pillars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+.pillars li { padding: 0 22px 4px 0; }
 .pillars li + li { padding-left: 22px; border-left: 1px solid var(--line); }
 .pillars span { display: block; color: #86cfff; font: 11px/1 ui-monospace, Consolas, monospace; letter-spacing: .12em; margin-bottom: 12px; }
+.pillars strong { display: block; color: #e6f3fb; font: 600 24px/1.05 "Barlow Condensed", sans-serif; text-transform: uppercase; letter-spacing: .01em; margin-bottom: 10px; }
+.pillars p { color: #b8cfe2; font-size: 14px; line-height: 1.5; margin: 0; }
 
 section.connect { padding-top: 130px; }
 
@@ -92,9 +103,9 @@ section.connect { padding-top: 130px; }
   .card { min-height: 340px; }
   .trackRow { grid-template-columns: 90px 230px 1fr 25px; }
   .aboutInner { grid-template-columns: 1fr; align-items: start; }
-  .pillars { grid-template-columns: repeat(2, 1fr); }
+  .whoWeAre { grid-template-columns: 1fr; gap: 16px; max-width: 640px; }
+  .pillars { grid-template-columns: repeat(2, 1fr); row-gap: 26px; }
   .pillars li:nth-child(3) { border-left: 0; padding-left: 0; }
-  .pillars li { padding-bottom: 22px; }
 }
 
 @media (max-width: 640px) {
@@ -115,8 +126,9 @@ section.connect { padding-top: 130px; }
   .trackRow svg { grid-column: 2; grid-row: 1 / 4; }
   .about { padding: 90px 0; }
   .aboutHead h2 { font-size: clamp(42px, 12vw, 60px); }
-  .aboutBody p { font-size: 15px; }
-  .pillars { grid-template-columns: 1fr; }
+  .aboutBody > p { font-size: 15px; }
+  .pillars { grid-template-columns: 1fr; row-gap: 0; }
   .pillars li, .pillars li + li { border-left: 0; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .pillars li:first-child { padding-top: 0; }
   section.connect { padding-top: 90px; }
 }

@@ -76,11 +76,12 @@ export const siteSections: readonly SiteSection[] = [
     ready: false,
   },
   {
+    // About is a section of the homepage, not a separate page.
     id: "about",
     label: "About",
-    href: "/about",
+    href: "/#about",
     title: "About",
-    blurb: "Who we are, what we do, and how to get involved.",
+    blurb: "Who we are and what we do.",
     ready: true,
   },
 ];
