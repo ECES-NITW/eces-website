@@ -33,6 +33,12 @@ Run the production command after verifying the migration on the preview database
 
 BigRock is the registrar for `ecesnitw.in`. Cloudflare manages DNS and TLS. Cloudflare's Workers dashboard is where maintainers manage builds, domains, and rollbacks.
 
+### Request a preview for a pull request
+
+Reviewers with Write access can open **Actions → Generate PR preview → Run workflow**. Keep the workflow branch set to `main` and enter the PR number and the full SHA of the latest commit you reviewed. The workflow pushes that exact commit to a dedicated preview branch, waits for Cloudflare, and shares the URL in the workflow summary and on the original PR. A new PR commit needs a new review and preview request.
+
+Same-repository feature branches still get automatic previews. Fork contributors can ask a reviewer to run the workflow. Review the code and its build configuration before requesting a preview, because Cloudflare builds the reviewed commit using the connected project's build credentials.
+
 ## Organizer access
 
 Organizers sign in with a passkey at [www.ecesnitw.in/organizer](https://www.ecesnitw.in/organizer). A Cloudflare maintainer issues a one-time enrollment code for each approved organizer:
