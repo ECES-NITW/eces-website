@@ -88,6 +88,9 @@ h1,h2,h3 { font-family: "Barlow Condensed", sans-serif; }
 @media(max-width: 640px) { .connect-section { width: calc(100% - 34px); padding-bottom: 110px; }.connect-row { grid-template-columns: 1fr 25px; }.main-footer .footer-social { order: 2; margin-left: auto; } }
 
 .roadmap-tabs { display: flex; border: 1px solid var(--line); margin-bottom: 40px; }
+.footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.footer-links a { display: inline-flex; align-items: center; gap: 9px; color: #c7eafb; font-size: 12px; text-transform: uppercase; padding-block: 10px; }
+.footer-links a:hover { color: var(--cyan); }
 .roadmap-tab { flex: 1; padding: 18px; background: rgba(6,24,52,.6); color: #c2ddef; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-weight: 600; font-size: 15px; transition: background .25s, color .25s; }
 .roadmap-tab:last-child { border-right: 0; }
 .roadmap-tab:hover { background: rgba(19,54,97,.67); }
