@@ -1,0 +1,31 @@
+.page { width: min(1220px, calc(100% - 68px)); margin: auto; padding: 35px 0 150px; }
+
+.back { display: inline-flex; align-items: center; gap: 10px; color: #c2ddef; font-size: 13px; margin-bottom: 60px; }
+.back:hover { color: #9ce6ff; }
+
+.heading { border-bottom: 1px solid var(--line); padding-bottom: 46px; }
+.kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 0 0 22px; color: #86cfff; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+.kicker > span:first-child { font-family: ui-monospace, Consolas, monospace; }
+.tag { border: 1px solid rgba(144, 226, 255, .5); color: var(--cyan); padding: 5px 9px; font-size: 10px; letter-spacing: .12em; }
+.heading h1 { font-size: clamp(76px, 9vw, 140px); line-height: .85; letter-spacing: -.028em; text-transform: uppercase; margin: 0 0 26px; }
+.blurb { max-width: 560px; color: #c7ddec; font-size: 17px; line-height: 1.55; margin: 0; }
+
+.plans { padding-top: 40px; }
+.plans h2 { color: #9ddaff; font: 600 12px/1 "Barlow", sans-serif; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 18px; }
+.plans ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.plans li { display: grid; grid-template-columns: 70px 1fr; gap: 20px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid var(--line); font: 600 clamp(26px, 2.6vw, 36px)/1.05 "Barlow Condensed", sans-serif; text-transform: uppercase; }
+.plans li span { color: #86cfff; font: 12px/1 ui-monospace, Consolas, monospace; letter-spacing: .13em; }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-top: 56px; }
+.actions p { color: #b8cfe2; font-size: 14px; margin: 0; }
+.cta { display: inline-flex; align-items: center; gap: 24px; padding: 16px 20px; color: #061528; background: #a5e7ff; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; transition: background .2s, transform .2s; }
+.cta:hover { background: #d2f4ff; transform: translateY(-2px); }
+
+@media (max-width: 900px) { .page { width: calc(100% - 40px); } }
+@media (max-width: 640px) {
+  .page { width: calc(100% - 34px); padding: 25px 0 110px; }
+  .back { margin-bottom: 40px; }
+  .heading h1 { font-size: clamp(60px, 16vw, 88px); }
+  .blurb { font-size: 15px; }
+  .plans li { grid-template-columns: 44px 1fr; gap: 12px; padding: 20px 0; }
+}
