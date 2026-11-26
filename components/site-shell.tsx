@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { socialLinks } from "@/lib/social-links";
 import { CursorTail, NeuralBackground } from "./site-effects";
@@ -8,6 +9,7 @@ import { SocialIcon } from "./social-icon";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   return <>
     <NeuralBackground />
     <CursorTail />
@@ -20,6 +22,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <nav className={open ? "main-nav open" : "main-nav"} aria-label="Main navigation">
           <a href="/#explore" onClick={() => setOpen(false)}>Explore</a>
           <a href="/#community" onClick={() => setOpen(false)}>Community</a>
+          <a href="/team" aria-current={pathname === "/team" ? "page" : undefined} onClick={() => setOpen(false)}>Team</a>
           <a href="/events" onClick={() => setOpen(false)}>Events</a>
         </nav>
         <a className="nav-cta" href="/events">Register for an event <ArrowUpRight size={16} /></a>
