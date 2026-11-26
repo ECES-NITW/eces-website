@@ -73,7 +73,7 @@ jobs:
           until=$((SECONDS + 1260))
           build=''
           while (( SECONDS < until )); do
-            build=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$REVIEWED_SHA/check-runs?per_page=100" |
+            build=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$REVIEWED_SHA/check-runs?filter=all&per_page=100" |
               jq -cs --arg prefix "$dashboard/previews/$preview/builds/" '
                 [.[].check_runs[] | select(.app.slug == "cloudflare-workers-and-pages")
                   | select((.details_url // "") | startswith($prefix))]
