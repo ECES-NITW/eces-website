@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
+import { isCurrentSection, siteSections } from "@/lib/site-sections";
 import { socialLinks } from "@/lib/social-links";
 import { CursorTail, NeuralBackground } from "./site-effects";
 import { SocialIcon } from "./social-icon";
@@ -20,11 +21,18 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <span><strong>ECE Society</strong><small>NIT Warangal</small></span>
         </a>
         <nav className={open ? "main-nav open" : "main-nav"} aria-label="Main navigation">
-          <a href="/#explore" onClick={() => setOpen(false)}>Explore</a>
-          <a href="/#community" onClick={() => setOpen(false)}>Community</a>
-          <a href="/roadmaps" onClick={() => setOpen(false)}>Roadmaps</a>
-          <a href="/team" aria-current={pathname === "/team" ? "page" : undefined} onClick={() => setOpen(false)}>Team</a>
-          <a href="/events" onClick={() => setOpen(false)}>Events</a>
+          {/* Plain links on purpose: next/link client navigation fails in production builds with
+              vinext 1.0.0-beta.5 (clicks do nothing). Switch to Link after upgrading vinext. */}
+          {siteSections.map(section => (
+            <a
+              key={section.id}
+              href={section.href}
+              aria-current={isCurrentSection(pathname, section.href) ? "page" : undefined}
+              onClick={() => setOpen(false)}
+            >
+              {section.label}
+            </a>
+          ))}
         </nav>
         <a className="nav-cta" href="/events">Register for an event <ArrowUpRight size={16} /></a>
         <button className="nav-toggle" type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>

@@ -106,3 +106,19 @@ h1,h2,h3 { font-family: "Barlow Condensed", sans-serif; }
 .roadmap-resources a:hover { border-color: #8ed6ff; background: rgba(19,54,97,.67); }
 .roadmap-resources small { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; color: #9bdaff; }
 @media (max-width: 640px) { .roadmap-topic { grid-template-columns: 1fr; gap: 6px; } .roadmap-body h2 { font-size: 32px; } }
+/* Multi-page navigation: eight section links. Collapse to the menu button at 1100px and
+   hide the register button where it would crowd the links. */
+.main-nav a { position: relative; white-space: nowrap; }
+.main-nav a[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 1px; background: var(--cyan); box-shadow: 0 0 10px rgba(144,226,255,.6); }
+@media (min-width: 1101px) and (max-width: 1280px) { .main-nav { gap: 30px; }.nav-cta { display: none; } }
+@media (max-width: 1100px) {
+  .main-nav { display: none; position: absolute; left: 0; right: 0; top: 83px; border: 1px solid var(--line); background: #08172c; flex-direction: column; align-items: stretch; padding: 17px; box-shadow: 0 20px 35px rgba(0,0,0,.5); }
+  .main-nav.open { display: flex; }
+  .main-nav { gap: 0; padding-block: 8px; }
+  .main-nav a { padding: 12px 7px; font-size: 14px; }
+  .main-nav a + a { border-top: 1px solid rgba(132,194,248,.1); }
+  .main-nav a[aria-current="page"]::after { left: -17px; right: auto; top: 9px; bottom: 9px; width: 2px; height: auto; }
+  .nav-cta { margin-left: auto; }
+  .nav-toggle { display: grid; place-items: center; }
+}
+@media (max-width: 900px) { .main-nav { top: 69px; } }

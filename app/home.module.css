@@ -1,0 +1,105 @@
+/* Homepage glimpses. Hero, event rows and social rows keep their global styles in globals.css. */
+
+.kicker { display: flex; align-items: center; gap: 12px; margin: 0 0 22px; color: #9ddaff; font-size: 11px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
+.kicker span { color: #86cfff; font: 12px/1 ui-monospace, Consolas, monospace; letter-spacing: .1em; }
+.kicker span::after { content: "/"; margin-left: 12px; color: #46709a; }
+
+section.whatsOn { padding-block: 120px 110px; }
+
+/* Inside the society: bento of Projects, Explore, Gallery and Team. */
+.society { width: min(1220px, calc(100% - 68px)); margin: auto; padding: 40px 0 120px; }
+.bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.bento > * { min-width: 0; }
+.wide { grid-column: span 2; }
+
+.card { display: flex; flex-direction: column; height: 100%; min-height: 380px; padding: 28px 30px 30px; }
+.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 2; }
+.cardTop .kicker { margin: 0; }
+.soon { border: 1px solid rgba(144, 226, 255, .45); color: var(--cyan); padding: 5px 9px; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.cardText { margin-top: auto; max-width: 470px; }
+.cardText h3 { font-size: clamp(36px, 3.4vw, 50px); line-height: .95; letter-spacing: -.015em; text-transform: uppercase; font-weight: 600; margin: 0 0 12px; }
+.cardText p { color: #bed4e6; font-size: 14px; line-height: 1.5; margin: 0 0 22px; }
+.cardLink { display: inline-flex; align-items: center; gap: 12px; color: #a7e6ff; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; transition: color .2s, gap .2s; }
+/* Stretch the CTA over the whole card (SpotlightCard's root is position: relative). */
+.cardLink::after { content: ""; position: absolute; inset: 0; z-index: 3; }
+.card:hover .cardLink { color: white; gap: 16px; }
+.cardLink:focus-visible { outline: none; }
+.card:has(.cardLink:focus-visible) { outline: 2px solid #a5e5ff; outline-offset: 4px; }
+
+/* Projects: circuit traces with a slow signal pulse. */
+.circuit { position: absolute; top: 0; right: 0; width: 68%; height: 62%; color: rgba(132, 202, 255, .32); pointer-events: none; mask-image: linear-gradient(200deg, black 35%, transparent 90%); }
+.signal { stroke: #9de5ff; stroke-width: 1.6; stroke-dasharray: 46 620; animation: pulse 6s linear infinite; filter: drop-shadow(0 0 4px rgba(144, 226, 255, .8)); }
+.signal + .signal { animation-delay: -3s; animation-duration: 7.5s; }
+@keyframes pulse { from { stroke-dashoffset: 666; } to { stroke-dashoffset: 0; } }
+
+/* Explore: topic lines. */
+.topics { list-style: none; margin: 34px 0 30px; padding: 0; position: relative; z-index: 2; }
+.topics li { border-top: 1px solid rgba(132, 194, 248, .16); padding: 11px 0; color: #d5e8f5; font: 500 19px/1.1 "Barlow Condensed", sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+.topics li:last-child { border-bottom: 1px solid rgba(132, 194, 248, .16); }
+
+/* Gallery: stacked photo frames. */
+.frames { position: relative; height: 150px; margin: 26px 0 24px; }
+.frames span { position: absolute; left: 50%; top: 50%; width: 150px; height: 108px; border: 1px solid rgba(157, 222, 255, .4); background: linear-gradient(160deg, rgba(37, 88, 150, .55), rgba(6, 20, 44, .9)); box-shadow: 0 16px 30px rgba(0, 0, 0, .35); }
+.frames span:nth-child(1) { transform: translate(-50%, -50%) translate(-58px, 6px) rotate(-9deg); opacity: .55; }
+.frames span:nth-child(2) { transform: translate(-50%, -50%) translate(50px, 2px) rotate(7deg); opacity: .75; }
+.frames span:nth-child(3) { transform: translate(-50%, -50%) rotate(-1deg); display: grid; place-items: center; color: #a7e6ff; background: linear-gradient(160deg, rgba(56, 120, 190, .55), rgba(8, 26, 54, .95)); border-color: rgba(167, 230, 255, .7); }
+.frames span:nth-child(3)::after { content: ""; position: absolute; inset: 8px 8px 22px; border: 1px solid rgba(167, 230, 255, .2); }
+.gallery:hover .frames span:nth-child(1) { transform: translate(-50%, -50%) translate(-72px, 8px) rotate(-12deg); }
+.gallery:hover .frames span:nth-child(2) { transform: translate(-50%, -50%) translate(64px, 2px) rotate(10deg); }
+.frames span { transition: transform .45s cubic-bezier(.22, 1, .36, 1); }
+
+/* Team: senior-role portraits from lib/team.ts. */
+.portraits { display: flex; align-items: center; flex-wrap: wrap; gap: 18px 26px; margin: 30px 0 28px; position: relative; z-index: 2; }
+.portraits ul { display: flex; list-style: none; margin: 0; padding: 0; }
+.portraits li { width: 84px; height: 84px; border: 2px solid #061631; background: #0b203b; overflow: hidden; transition: transform .3s; }
+.portraits li + li { margin-left: -14px; }
+.portraits img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85); }
+.team:hover .portraits li { transform: translateY(-3px); }
+.team:hover .portraits li:nth-child(even) { transform: translateY(3px); }
+.portraits p { color: #bed4e6; font-size: 13px; margin: 0; }
+.portraits strong { display: block; color: var(--ice); font: 600 34px/1 "Barlow Condensed", sans-serif; }
+
+/* Roadmaps: thin-ruled track rows. */
+.roadmaps { width: min(1220px, calc(100% - 68px)); margin: auto; padding: 40px 0 130px; }
+.trackList { border-top: 1px solid var(--line); }
+.trackRow { display: grid; grid-template-columns: 110px minmax(200px, 340px) 1fr 26px; gap: 20px; align-items: center; min-height: 128px; padding-block: 18px; border-bottom: 1px solid var(--line); transition: transform .25s, background .25s; }
+.trackRow:hover { transform: translateX(7px); background: rgba(60, 148, 246, .1); }
+.trackRow > span:first-child { color: #9ddaff; text-transform: uppercase; font-weight: 600; font-size: 12px; letter-spacing: .09em; }
+.trackRow h3 { font-size: clamp(31px, 3vw, 45px); line-height: 1; font-weight: 600; text-transform: uppercase; margin: 0; }
+.trackNote { color: #d5e8f5; font-size: 15px; line-height: 1.45; }
+.trackNote small { display: block; color: #a9c4da; font-size: 12px; margin-top: 4px; }
+.trackRow svg { color: #94daff; }
+
+/* About block, with the outlined ECES lettering from the old Community section. */
+.about { position: relative; overflow: hidden; padding: 120px 0; background: radial-gradient(circle at 20% 45%, rgba(15, 66, 128, .58), rgba(4, 21, 48, .63) 50%, rgba(4, 13, 27, .86) 100%); border-block: 1px solid var(--line); }
+.aboutMark { position: absolute; left: -2vw; top: 50%; transform: translateY(-50%); font: 700 clamp(200px, 35vw, 540px)/.8 "Barlow Condensed", sans-serif; letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 1px rgba(108, 182, 250, .14); pointer-events: none; }
+/* Grid for components/about-section.tsx: head and body side by side, the expandable panel below. */
+.aboutInner { width: min(1220px, calc(100% - 68px)); margin: auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 0 75px; align-items: end; }
+@media (prefers-reduced-motion: reduce) { .signal { animation: none; opacity: 0; } }
+
+@media (max-width: 900px) {
+  .society, .roadmaps, .aboutInner { width: calc(100% - 40px); }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card { min-height: 340px; }
+  .trackRow { grid-template-columns: 90px 230px 1fr 25px; }
+  .aboutInner { grid-template-columns: 1fr; align-items: start; }
+}
+
+@media (max-width: 640px) {
+  section.whatsOn { padding-block: 90px 80px; }
+  .society, .roadmaps, .aboutInner { width: calc(100% - 34px); }
+  .society { padding-bottom: 90px; }
+  .roadmaps { padding-bottom: 100px; }
+  .bento { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
+  .card { min-height: 0; padding: 24px 22px 26px; }
+  .circuit { width: 100%; height: 150px; }
+  .projects .cardText { margin-top: 120px; }
+  .portraits li { width: 64px; height: 64px; }
+  .trackRow { grid-template-columns: 1fr 25px; gap: 6px 12px; min-height: 0; padding-block: 20px; }
+  .trackRow > span:first-child { grid-column: 1; font-size: 10px; }
+  .trackRow h3 { grid-column: 1; font-size: 31px; }
+  .trackNote { grid-column: 1; font-size: 14px; }
+  .trackRow svg { grid-column: 2; grid-row: 1 / 4; }
+  .about { padding: 90px 0; }
+}
