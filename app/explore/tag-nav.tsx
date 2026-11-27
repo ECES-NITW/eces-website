@@ -9,6 +9,7 @@ export function TagNav({ activeSlug }: { activeSlug: string }) {
     <PillNav
       logo="/ece-logo.png"
       logoAlt="ECES"
+      logoHref="/"
       items={EXPLORE_TAGS.map((t) => ({ label: t.label, href: tagHref(t.slug) }))}
       activeHref={tagHref(activeSlug)}
       itemStyle="pill"
@@ -32,6 +33,7 @@ export function TagNav({ activeSlug }: { activeSlug: string }) {
           "--pn-tile-rim": "inset 0 0 0 1px rgba(132, 194, 248, 0.38)",
           "--pn-edge": "rgba(132, 194, 248, 0.3)",
           "--pn-rim": "rgba(144, 226, 255, 0.14)",
+          "--pn-panel-surface": "rgba(7, 20, 41, 0.96)",
         } as CSSProperties
       }
     />

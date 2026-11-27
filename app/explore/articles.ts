@@ -12,13 +12,18 @@ export type Article = {
   tags: string[];
 };
 
+export type ArticlesResult = {
+  articles: Article[];
+  failedSources: string[];
+};
+
 type FeedSource = {
   name: string;
   url: string;
 };
 
 type ParsedItem = Article & {
-  publishedMs: number;
+  publishedMs: number | null;
   searchText: string;
 };
 
@@ -28,6 +33,8 @@ const FEEDS: FeedSource[] = [
 ];
 
 const MAX_PER_SOURCE = 10;
+const MAX_PARSED_ITEMS = 60;
+const MAX_FEED_BYTES = 1024 * 1024; // 1 MB cap per feed response
 
 function hashUrl(url: string): number {
   let h = 2166136261;
@@ -38,14 +45,29 @@ function hashUrl(url: string): number {
   return h >>> 0;
 }
 
+function safeHttpUrl(raw: string): string | null {
+  try {
+    const parsed = new URL(raw);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function unwrapCdata(raw: string): string {
   return raw.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
 }
 
 function decodeEntities(text: string): string {
   return text
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (match, code) => {
+      const n = Number(code);
+      return n >= 0 && n <= 0x10ffff && (n < 0xd800 || n > 0xdfff) ? String.fromCodePoint(n) : match;
+    })
+    .replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => {
+      const n = parseInt(hex, 16);
+      return n >= 0 && n <= 0x10ffff && (n < 0xd800 || n > 0xdfff) ? String.fromCodePoint(n) : match;
+    })
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&lt;/gi, "<")
@@ -60,12 +82,10 @@ function decodeEntities(text: string): string {
 }
 
 function stripHtml(html: string): string {
-  return decodeEntities(
-    html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-  )
+  return decodeEntities(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -91,12 +111,12 @@ function extractAllTags(block: string, tag: string): string[] {
 function extractCover(block: string, htmlBodies: string[]): string | null {
   const mediaMatch = block.match(/<(?:media:content|media:thumbnail|enclosure)\b[^>]*\burl=["']([^"']+)["']/i);
   if (mediaMatch?.[1] && /\.(?:png|jpe?g|webp|gif|avif)|media-library|wp-content\/uploads/i.test(mediaMatch[1])) {
-    return decodeEntities(mediaMatch[1]);
+    return safeHttpUrl(decodeEntities(mediaMatch[1]));
   }
   for (const body of htmlBodies) {
     const imgMatch = body.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
     if (imgMatch?.[1] && !/1x1|pixel|gravatar/i.test(imgMatch[1])) {
-      return decodeEntities(imgMatch[1]);
+      return safeHttpUrl(decodeEntities(imgMatch[1]));
     }
   }
   return null;
@@ -109,13 +129,23 @@ function cleanSummary(rawDesc: string): string {
   return text || "Read the full technical article for details.";
 }
 
-function parseFeed(xml: string, sourceName: string): ParsedItem[] {
-  const itemBlocks = xml.match(/<item\b[^>]*>[\s\S]*?<\/item>/gi) ?? [];
-  const items: ParsedItem[] = [];
+function compareByDateDesc(a: ParsedItem, b: ParsedItem): number {
+  if (a.publishedMs === null && b.publishedMs === null) return 0;
+  if (a.publishedMs === null) return 1;
+  if (b.publishedMs === null) return -1;
+  return b.publishedMs - a.publishedMs;
+}
 
-  for (const block of itemBlocks) {
+function parseFeed(xml: string, sourceName: string): ParsedItem[] {
+  const itemRe = /<item\b[^>]*>[\s\S]*?<\/item>/gi;
+  const items: ParsedItem[] = [];
+  let match: RegExpExecArray | null;
+
+  while (items.length < MAX_PARSED_ITEMS && (match = itemRe.exec(xml)) !== null) {
+    const block = match[0];
     const title = decodeEntities(extractTag(block, "title")).trim();
-    const url = decodeEntities(extractTag(block, "link")).trim();
+    const rawUrl = decodeEntities(extractTag(block, "link")).trim();
+    const url = safeHttpUrl(rawUrl);
     if (!title || !url) continue;
 
     const rawDesc = extractTag(block, "description");
@@ -125,22 +155,28 @@ function parseFeed(xml: string, sourceName: string): ParsedItem[] {
 
     const author = decodeEntities(extractTag(block, "dc:creator") || extractTag(block, "author")) || sourceName;
     const pubDateStr = extractTag(block, "pubDate");
-    const parsedDate = pubDateStr ? new Date(pubDateStr) : new Date();
-    const validDate = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+    const parsedDate = pubDateStr ? new Date(pubDateStr) : null;
+    const publishedMs = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.getTime() : null;
 
-    const date = validDate.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      timeZone: "UTC",
-    });
+    const date =
+      publishedMs !== null
+        ? new Date(publishedMs).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            timeZone: "UTC",
+          })
+        : "";
 
     const wordSource = stripHtml(rawContent || rawDesc);
     const wordCount = wordSource ? wordSource.split(/\s+/).length : 0;
     const readingTime = Math.max(2, Math.round(wordCount / 200));
 
     const rssCategories = extractAllTags(block, "category");
-    const tags = [sourceName, ...rssCategories.filter((c) => c.toLowerCase() !== "news" && c.toLowerCase() !== "blog reviews")];
+    const tags = [
+      sourceName,
+      ...rssCategories.filter((c) => c.toLowerCase() !== "news" && c.toLowerCase() !== "blog reviews"),
+    ];
 
     items.push({
       id: hashUrl(url),
@@ -152,7 +188,7 @@ function parseFeed(xml: string, sourceName: string): ParsedItem[] {
       date,
       readingTime,
       tags,
-      publishedMs: validDate.getTime(),
+      publishedMs,
       searchText: `${title} ${summary} ${rssCategories.join(" ")}`.toLowerCase(),
     });
   }
@@ -168,7 +204,36 @@ function matchesTag(item: ParsedItem, tag: ExploreTag): boolean {
   });
 }
 
-async function fetchFeed(source: FeedSource): Promise<ParsedItem[]> {
+async function readBoundedText(res: Response, maxBytes: number): Promise<string> {
+  if (!res.body) {
+    return (await res.text()).slice(0, maxBytes);
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let received = 0;
+  let result = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const remaining = maxBytes - received;
+      if (value.byteLength >= remaining) {
+        result += decoder.decode(value.subarray(0, remaining), { stream: false });
+        await reader.cancel();
+        break;
+      }
+      received += value.byteLength;
+      result += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return result + decoder.decode();
+}
+
+async function fetchFeed(source: FeedSource): Promise<{ name: string; items: ParsedItem[]; ok: boolean }> {
   try {
     const res = await fetch(source.url, {
       signal: AbortSignal.timeout(10000),
@@ -179,32 +244,45 @@ async function fetchFeed(source: FeedSource): Promise<ParsedItem[]> {
       next: { revalidate: 60 * 30, tags: ["explore-rss"] },
     });
     if (!res.ok) throw new Error(`${source.name} responded ${res.status}`);
-    const xml = await res.text();
-    return parseFeed(xml, source.name);
+    const xml = await readBoundedText(res, MAX_FEED_BYTES);
+    return { name: source.name, items: parseFeed(xml, source.name), ok: true };
   } catch (err) {
     console.error(`[explore] failed to load ${source.name} RSS:`, err);
-    return [];
+    return { name: source.name, items: [], ok: false };
   }
 }
 
-export async function getArticles(tag: ExploreTag): Promise<Article[]> {
-  const perSource = await Promise.all(FEEDS.map(fetchFeed));
+export async function getArticles(tag: ExploreTag): Promise<ArticlesResult> {
+  const results = await Promise.all(FEEDS.map(fetchFeed));
+  const failedSources = results.filter((r) => !r.ok).map((r) => r.name);
 
-  const selected = perSource.flatMap((items) =>
-    items.filter((item) => matchesTag(item, tag)).slice(0, MAX_PER_SOURCE)
-  );
+  const seenUrls = new Set<string>();
+  const selected = results.flatMap(({ items }) => {
+    const matching = items.filter((item) => matchesTag(item, tag)).sort(compareByDateDesc);
+    const unique: ParsedItem[] = [];
+    for (const item of matching) {
+      if (seenUrls.has(item.url)) continue;
+      seenUrls.add(item.url);
+      unique.push(item);
+      if (unique.length >= MAX_PER_SOURCE) break;
+    }
+    return unique;
+  });
 
-  selected.sort((a, b) => b.publishedMs - a.publishedMs);
+  selected.sort(compareByDateDesc);
 
-  return selected.map((item) => ({
-    id: item.id,
-    title: item.title,
-    summary: item.summary,
-    url: item.url,
-    cover: item.cover,
-    author: item.author,
-    date: item.date,
-    readingTime: item.readingTime,
-    tags: item.tags,
-  }));
+  return {
+    articles: selected.map((item) => ({
+      id: item.id,
+      title: item.title,
+      summary: item.summary,
+      url: item.url,
+      cover: item.cover,
+      author: item.author,
+      date: item.date,
+      readingTime: item.readingTime,
+      tags: item.tags,
+    })),
+    failedSources,
+  };
 }

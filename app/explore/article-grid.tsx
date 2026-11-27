@@ -7,17 +7,17 @@ import type { Article } from "./articles";
 const GRID = "grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] justify-items-center gap-7";
 
 export function ArticleGrid({ articles }: { articles: Article[] }) {
-  const [flippedId, setFlippedId] = useState<number | null>(null);
+  const [flippedUrl, setFlippedUrl] = useState<string | null>(null);
 
   return (
     <div className={GRID}>
       {articles.map((a) => (
         <ArticleCard
-          key={a.id}
+          key={a.url}
           article={a}
-          flipped={flippedId === a.id}
+          flipped={flippedUrl === a.url}
           onFlipChange={(isFlipped) =>
-            setFlippedId(isFlipped ? a.id : null)
+            setFlippedUrl(isFlipped ? a.url : null)
           }
         />
       ))}

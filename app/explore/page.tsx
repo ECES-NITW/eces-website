@@ -13,17 +13,28 @@ export const metadata: Metadata = {
 type Props = { searchParams: Promise<{ tag?: string }> }; // Next 15+
 
 async function Articles({ slug }: { slug: string }) {
-  const articles = await getArticles(resolveTag(slug));
+  const { articles, failedSources } = await getArticles(resolveTag(slug));
 
   if (articles.length === 0) {
     return (
       <p className="py-20 text-center text-white/60">
-        Nothing here right now. Try another tag or check back later.
+        {failedSources.length > 0
+          ? `Unable to reach ${failedSources.join(" and ")} right now. Please check back later.`
+          : "Nothing here right now. Try another tag or check back later."}
       </p>
     );
   }
 
-  return <ArticleGrid articles={articles} />;
+  return (
+    <>
+      {failedSources.length > 0 ? (
+        <p className="mb-6 text-center text-xs text-[#b7cce0]/80">
+          Showing partial results — {failedSources.join(" and ")} temporarily unavailable.
+        </p>
+      ) : null}
+      <ArticleGrid articles={articles} />
+    </>
+  );
 }
 
 function GridSkeleton() {

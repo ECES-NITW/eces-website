@@ -289,7 +289,9 @@ const PillNav = ({
     stretch: clamp(stretch, 0, 1)
   };
   const settingsRef = useRef(settings);
-  settingsRef.current = settings;
+  useLayoutEffect(() => {
+    settingsRef.current = settings;
+  });
 
   const palette = THEMES[theme] ?? THEMES.dark;
   const vars: Record<string, string> = { ...palette, ...(SIZES[size] ?? SIZES.md) };
@@ -476,8 +478,12 @@ const PillNav = ({
         state.press = pressTarget;
         state.pressVelocity = 0;
       } else {
-        state.pressVelocity += (-700 * (state.press - pressTarget) - 30 * state.pressVelocity) * dt;
-        state.press += state.pressVelocity * dt;
+        const steps = Math.ceil(dt / (1 / 240));
+        const h = dt / steps;
+        for (let i = 0; i < steps; i++) {
+          state.pressVelocity += (-700 * (state.press - pressTarget) - 30 * state.pressVelocity) * h;
+          state.press += state.pressVelocity * h;
+        }
       }
       if (Math.abs(state.press - pressTarget) > 0.0005 || Math.abs(state.pressVelocity) > 0.01) busy = true;
 
@@ -587,17 +593,21 @@ const PillNav = ({
       }, 420);
     }
 
+    let disposed = false;
     const resizeObserver = new ResizeObserver(() => {
       measure();
       render();
       wake();
     });
     if (trackRef.current) resizeObserver.observe(trackRef.current);
-    document.fonts?.ready?.then(() => engine.refresh()).catch(() => {});
+    document.fonts?.ready?.then(() => {
+      if (!disposed) engine.refresh();
+    }).catch(() => {});
     window.addEventListener('pointerup', engine.release);
     window.addEventListener('pointercancel', engine.release);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(raf);
       window.clearTimeout(timer);
       resizeObserver.disconnect();
@@ -617,7 +627,12 @@ const PillNav = ({
     if (!root || !measureEl) return undefined;
     const evaluate = () => {
       if (collapse === 'always' || collapse === 'never') {
-        setCollapsed(collapse === 'always');
+        const next = collapse === 'always';
+        setCollapsed(next);
+        if (!next) {
+          setOpen(false);
+          setPanelShown(false);
+        }
         return;
       }
       const parent = root.parentElement;
@@ -636,6 +651,10 @@ const PillNav = ({
       const next = need > available + 0.5;
       if (introRef.current && next !== collapsed) pendingRef.current = next;
       setCollapsed(next);
+      if (!next) {
+        setOpen(false);
+        setPanelShown(false);
+      }
     };
     evaluate();
     const observer = new ResizeObserver(evaluate);
@@ -689,15 +708,12 @@ const PillNav = ({
     });
   }, [collapsed, joined]);
 
-  useEffect(() => {
-    if (!collapsed && open) setOpen(false);
-  }, [collapsed, open]);
-
   useLayoutEffect(() => {
     const panel = panelRef.current;
     const root = rootRef.current;
     if (!panel || !root) return undefined;
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (reduce) return undefined;
     const width = panel.offsetWidth;
     const height = panel.offsetHeight;
     const header = joined ? root.offsetHeight : (toggleRef.current?.offsetHeight ?? 44);
@@ -708,7 +724,6 @@ const PillNav = ({
     const rows = panel.querySelectorAll('li');
     const running: Animation[] = [];
     if (open) {
-      if (reduce) return undefined;
       running.push(panel.animate([{ clipPath: start }, { clipPath: end }], { duration: 560, easing: EASE_OUT }));
       rows.forEach((row, index) => {
         running.push(
@@ -722,10 +737,6 @@ const PillNav = ({
         );
       });
     } else {
-      if (reduce) {
-        setPanelShown(false);
-        return undefined;
-      }
       const morph = panel.animate([{ clipPath: end }, { clipPath: start }], {
         duration: 380,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -782,7 +793,8 @@ const PillNav = ({
 
   const toggle = () => {
     const next = !open;
-    if (next) setPanelShown(true);
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (next && !reduce) setPanelShown(true);
     setOpen(next);
     onMenuToggle?.(next);
   };
@@ -904,8 +916,13 @@ const PillNav = ({
         </button>
       )}
 
-      {collapsed && panelShown && (
-        <div ref={panelRef} id={panelId} className={[PANEL, SURFACE].join(' ')}>
+      {collapsed && (open || panelShown) && (
+        <div
+          ref={panelRef}
+          id={panelId}
+          inert={!open}
+          className={[PANEL, SURFACE, '[background:var(--pn-panel-surface,var(--pn-surface))]'].join(' ')}
+        >
           <ul className={MENU}>
             {items.map((item, index) => (
               <li key={`${item.label}-${index}`}>

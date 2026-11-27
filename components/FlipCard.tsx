@@ -111,7 +111,9 @@ const FlipCard: React.FC<FlipCardProps> = ({
   const [dragging, setDragging] = useState(false);
   const shown = controlled ? flipped : inner;
   const shownRef = useRef(shown);
-  shownRef.current = shown;
+  useEffect(() => {
+    shownRef.current = shown;
+  }, [shown]);
   const rootRef = useRef<HTMLDivElement>(null);
   const grip = useRef<Grip | null>(null);
   const spin = useRef<AnimationPlaybackControls | null>(null);
@@ -137,17 +139,24 @@ const FlipCard: React.FC<FlipCardProps> = ({
 
   const settle = (to: number, velocity: number, instant: boolean) => {
     spin.current?.stop();
+    const next = isBack(to);
+    if (controlled) {
+      const restAngle = target.current;
+      if (instant || reduce) turn.jump(restAngle);
+      else spin.current = animate(turn, restAngle, { type: 'spring', stiffness, damping, velocity, restDelta: 0.05 });
+      if (next !== shownRef.current) onFlipChange?.(next);
+      return;
+    }
     target.current = to;
     if (instant || reduce) turn.jump(to);
     else spin.current = animate(turn, to, { type: 'spring', stiffness, damping, velocity, restDelta: 0.05 });
-    const next = isBack(to);
     if (next === shownRef.current) return;
     shownRef.current = next;
-    if (!controlled) setInner(next);
+    setInner(next);
     onFlipChange?.(next);
   };
   const flip = (instant: boolean) => {
-    const base = snap(turn.get());
+    const base = target.current;
     settle(isBack(base) ? base - 180 : base + 180, 0, instant);
   };
   const rest = () => {
@@ -243,7 +252,7 @@ const FlipCard: React.FC<FlipCardProps> = ({
     settle(to, velocity, false);
   };
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (disabled || (e.key !== 'Enter' && e.key !== ' ')) return;
+    if (disabled || e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
     e.preventDefault();
     if (!e.repeat) flip(true);
   };
@@ -266,7 +275,7 @@ const FlipCard: React.FC<FlipCardProps> = ({
       aria-pressed={shown}
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
-      className={`group relative inline-block max-w-full cursor-pointer touch-pan-y select-none outline-none [width:var(--fc-w)] [height:var(--fc-h)] [border-radius:var(--fc-radius)] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] data-[axis=x]:touch-pan-x data-[draggable]:cursor-grab data-[dragging]:cursor-grabbing data-[disabled]:cursor-default data-[disabled]:opacity-60${className ? ` ${className}` : ''}`}
+      className={`group relative inline-block max-w-full cursor-pointer touch-pan-y select-none outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a5e5ff] [width:var(--fc-w)] [height:var(--fc-h)] [border-radius:var(--fc-radius)] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] data-[axis=x]:touch-pan-x data-[draggable]:cursor-grab data-[dragging]:cursor-grabbing data-[disabled]:cursor-default data-[disabled]:opacity-60${className ? ` ${className}` : ''}`}
       data-axis={axis}
       data-draggable={draggable && !disabled && !reduce ? '' : undefined}
       data-dragging={dragging ? '' : undefined}
