@@ -33,11 +33,13 @@ Run the production command after verifying the migration on the preview database
 
 BigRock is the registrar for `ecesnitw.in`. Cloudflare manages DNS and TLS. Cloudflare's Workers dashboard is where maintainers manage builds, domains, and rollbacks.
 
-### Request a preview for a pull request
+### Preview a pull request
 
-Reviewers with Write access can open **Actions → Generate PR preview → Run workflow**. Keep the workflow branch set to `main` and enter the PR number and the full SHA of the latest commit you reviewed. The workflow pushes that exact commit to a dedicated preview branch, waits for Cloudflare, and shares the URL in the workflow summary and on the original PR. A new PR commit needs a new review and preview request.
+For same-repository PRs targeting `main`, **Share PR preview** automatically waits for the branch's Cloudflare build to succeed and comments with its stable preview URL. Later pushes update the site at that link without adding another comment. If Cloudflare has already posted the link, the workflow skips its own comment. No Cloudflare token or additional repository secret is needed. The workflow reads build checks and PR metadata without checking out or executing PR code.
 
-Same-repository feature branches still get automatic previews. Fork contributors can ask a reviewer to run the workflow. Review the code and its build configuration before requesting a preview, because Cloudflare builds the reviewed commit using the connected project's build credentials.
+This workflow becomes available after it is merged into `main`. It waits up to 27 minutes; if the build fails or times out, check Cloudflare Builds and re-run the workflow after the build succeeds. Existing PRs trigger it when reopened or when their next commit is pushed.
+
+Contributors with Write access should push their feature branch to this repository and open a PR into `main`. Cloudflare builds that branch automatically; no manual preview request or extra preview branch is needed. Fork PRs are excluded from this workflow.
 
 ## Organizer access
 
