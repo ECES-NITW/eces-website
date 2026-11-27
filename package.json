@@ -2,8 +2,22 @@
   "name": "site-creator-vinext-starter",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=22.13.0"
+  "description": "The society website lists events and accepts registrations. Organizers manage events and export registrations at [www.ecesnitw.in/admin](https://www.ecesnitw.in/admin).",
+  "homepage": "https://github.com/ECES-NITW/eces-website#readme",
+  "bugs": {
+    "url": "https://github.com/ECES-NITW/eces-website/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ECES-NITW/eces-website.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
   },
   "scripts": {
     "install:ci": "node scripts/install-ci.mjs",
@@ -33,7 +47,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.31.0",
-    "motion": "^14.14.0",
+    "motion": "^12.43.0",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.6.7",
@@ -72,7 +86,9 @@
     "vite": "8.0.13",
     "wrangler": "4.162.0"
   },
-  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "overrides": {
     "miniflare": {
       "sharp": "0.35.4"
