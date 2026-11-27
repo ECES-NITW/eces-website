@@ -1,103 +1,98 @@
-name: Generate PR preview
-run-name: Generate preview for PR #${{ inputs.pr }}
+name: Share PR preview
 
 on:
-  workflow_dispatch:
-    inputs:
-      pr:
-        description: Open pull request number
-        required: true
-        type: string
-      reviewed_sha:
-        description: Full SHA of the pull request head you reviewed
-        required: true
-        type: string
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize]
 
 permissions: {}
 
 concurrency:
-  group: pr-preview-${{ inputs.pr }}
-  cancel-in-progress: false
+  group: pr-preview-comment-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
-  preview:
-    if: github.ref == 'refs/heads/main'
+  comment:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     permissions:
       checks: read
-      contents: write
       pull-requests: write
     steps:
-      - name: Request the Cloudflare build and share the preview
+      # pull_request_target gives comment permission using the base branch's workflow.
+      # Never check out, import, or execute code from the pull request here.
+      - name: Wait for Cloudflare and comment once
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ inputs.pr }}
-          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         shell: bash
         run: |
-          if [[ ! "$PR_NUMBER" =~ ^[1-9][0-9]{0,9}$ || ! "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::Enter a pull request number and the full 40-character commit SHA."
+          marker='<!-- eces-cloudflare-branch-preview -->'
+          dashboard='https://dash.cloudflare.com/77740a0c165b8e8f175234ee03731fe5/workers/services/view/eces-website/production'
+          # Match Wrangler/Cloudflare's branch preview naming (e.g. feature/login).
+          preview=$(printf '%s' "$HEAD_BRANCH" | LC_ALL=C sed -E 's/[^a-zA-Z0-9-]/-/g; s/-+/-/g; s/^-//; s/-$//' | tr '[:upper:]' '[:lower:]')
+          if [[ -z "$preview" ]]; then
+            echo '::error::The branch name cannot form a Cloudflare preview name.'
             exit 1
           fi
+          preview_url="https://$preview-eces-website.georgeaaron005.workers.dev"
 
-          require_reviewed_head() {
-            gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" |
-              jq -e --arg sha "$REVIEWED_SHA" \
-                '.state == "open" and .base.ref == "main" and .head.sha == $sha' >/dev/null ||
-              { echo "::error::The PR must be open, target main, and still be at the reviewed SHA."; exit 1; }
+          already_shared() {
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" |
+              jq -cs -e --arg marker "$marker" --arg url "$preview_url" '
+                any(.[][]; .user.type == "Bot" and
+                  (.user.login == "github-actions[bot]" or .user.login == "cloudflare-workers-and-pages[bot]") and
+                  ((.body // "") | contains($marker) or contains($url)))' >/dev/null
           }
 
-          require_reviewed_head
-          preview="preview-pr-$PR_NUMBER-${REVIEWED_SHA:0:12}"
-          ref="refs/heads/$preview"
-          preview_url="https://$preview-eces-website.georgeaaron005.workers.dev"
-          dashboard="https://dash.cloudflare.com/77740a0c165b8e8f175234ee03731fe5/workers/services/view/eces-website/production"
-
-          # Fetch the commit as Git objects. This job never checks out or executes PR code.
-          git init --bare "$RUNNER_TEMP/pr-preview.git"
-          cd "$RUNNER_TEMP/pr-preview.git"
-          gh auth setup-git --hostname github.com
-          git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
-          git fetch --no-tags --depth=1 origin "refs/pull/$PR_NUMBER/head"
-          if [[ "$(git rev-parse FETCH_HEAD)" != "$REVIEWED_SHA" ]]; then
-            echo "::error::The PR advanced during fetch. Review its new head before requesting a preview."
-            exit 1
+          if already_shared; then
+            echo 'The PR already has its branch preview link.'
+            exit 0
           fi
 
-          # A non-forced push gives each reviewed commit its own preview and URL.
-          require_reviewed_head
-          git push origin "$REVIEWED_SHA:$ref"
+          # Cloudflare builds independently of Actions; it may also finish before PR creation.
+          deadline=$((SECONDS + 1620))
+          while (( SECONDS < deadline )); do
+            pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
+            if ! jq -e --arg sha "$HEAD_SHA" --arg repo "$GITHUB_REPOSITORY" '
+              .state == "open" and .base.ref == "main" and
+              .head.sha == $sha and .head.repo.full_name == $repo' <<< "$pr" >/dev/null; then
+              echo 'The PR closed, changed target, or advanced; this run is no longer needed.'
+              exit 0
+            fi
 
-          # A commit can be on several branches. Only accept the build for this preview branch.
-          until=$((SECONDS + 1260))
-          build=''
-          while (( SECONDS < until )); do
-            build=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$REVIEWED_SHA/check-runs?filter=all&per_page=100" |
+            # A SHA can exist on multiple branches; require this Worker's exact preview.
+            build=$(gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA/check-runs?filter=all&per_page=100" |
               jq -cs --arg prefix "$dashboard/previews/$preview/builds/" '
                 [.[].check_runs[] | select(.app.slug == "cloudflare-workers-and-pages")
                   | select((.details_url // "") | startswith($prefix))]
                 | max_by(.id) // empty')
             if [[ "$(jq -r '.status' <<< "$build")" == completed ]]; then
-              break
+              if [[ "$(jq -r '.conclusion' <<< "$build")" != success ]]; then
+                echo '::error::Cloudflare preview build failed. Fix or retry the build, then re-run this workflow.'
+                exit 1
+              fi
+
+              # Recheck after waiting in case Cloudflare posted its native comment meanwhile.
+              if already_shared; then
+                echo 'The PR already has its branch preview link.'
+                exit 0
+              fi
+              # Do not post for a PR that changed while the check was being fetched.
+              gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" |
+                jq -e --arg sha "$HEAD_SHA" '.state == "open" and .base.ref == "main" and .head.sha == $sha' >/dev/null || exit 0
+
+              printf '%s\n### Cloudflare preview\n\n[Open branch preview](%s)\n\nThis link updates automatically after successful builds on this branch.\n' \
+                "$marker" "$preview_url" > "$RUNNER_TEMP/preview-comment.md"
+              gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/preview-comment.md"
+              cat "$RUNNER_TEMP/preview-comment.md" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
             fi
             sleep 15
           done
 
-          build_url="$dashboard"
-          if [[ -n "$build" ]]; then
-            build_url=$(jq -r '.details_url' <<< "$build")
-          fi
-          if [[ "$(jq -r '.conclusion' <<< "$build")" != success ]]; then
-            printf '### Cloudflare preview did not complete\n\nCheck [Cloudflare Builds](%s) for branch `%s`.\n' \
-              "$build_url" \
-              "$preview" >> "$GITHUB_STEP_SUMMARY"
-            echo "::error::Cloudflare did not report a successful preview build for $preview."
-            exit 1
-          fi
-
-          require_reviewed_head
-          printf '### Cloudflare preview\n\n[Open preview](%s) for commit `%s`. [Build details](%s)\n' \
-            "$preview_url" "$REVIEWED_SHA" "$build_url" > "$RUNNER_TEMP/preview-comment.md"
-          cat "$RUNNER_TEMP/preview-comment.md" >> "$GITHUB_STEP_SUMMARY"
-          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/preview-comment.md"
+          echo '::error::Cloudflare did not finish a matching preview within 27 minutes. Check Cloudflare Builds, then re-run this workflow.'
+          exit 1
