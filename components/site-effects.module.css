@@ -1,0 +1,35 @@
+/* Custom cursor (components/effects/signal-cursor.ts). Only active for mouse and trackpad users
+   who haven't asked for reduced motion; everyone else keeps the native cursor. */
+
+:global(html.eces-cursor),
+:global(html.eces-cursor *) { cursor: none; }
+/* Text fields keep the native text cursor (the custom one hides over them). */
+:global(html.eces-cursor input),
+:global(html.eces-cursor textarea),
+:global(html.eces-cursor select),
+:global(html.eces-cursor [contenteditable="true"]) { cursor: auto; }
+
+.dot,
+.ring { position: fixed; left: 0; top: 0; z-index: 101; pointer-events: none; opacity: 0; transition: opacity .25s ease; will-change: transform; }
+.visible { opacity: 1; }
+.text { opacity: 0; }
+
+.dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #effbff; box-shadow: 0 0 6px 1px rgba(150, 225, 255, .95), 0 0 16px 3px rgba(75, 164, 255, .55); }
+
+.ring { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+.ringCircle,
+.reticle { position: absolute; inset: 0; transition: transform .35s cubic-bezier(.22, 1, .36, 1), opacity .25s ease, border-color .25s ease, background-color .25s ease; }
+.ringCircle { border-radius: 50%; border: 1px solid rgba(144, 226, 255, .65); box-shadow: 0 0 12px rgba(75, 164, 255, .35), inset 0 0 8px rgba(75, 164, 255, .2); }
+/* Four probe ticks around the ring, shown over links and buttons. */
+.reticle { inset: -7px; opacity: 0; transform: scale(.7) rotate(-45deg);
+  background:
+    linear-gradient(var(--cyan), var(--cyan)) top center / 1px 7px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) bottom center / 1px 7px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) left center / 7px 1px no-repeat,
+    linear-gradient(var(--cyan), var(--cyan)) right center / 7px 1px no-repeat; }
+
+.active .ringCircle { transform: scale(1.5); border-color: var(--cyan); background-color: rgba(144, 226, 255, .08); }
+.active .reticle { opacity: 1; transform: scale(1.5) rotate(0deg); }
+.pressed .ringCircle { transform: scale(.75); }
+.active.pressed .ringCircle { transform: scale(1.25); }
+.active.pressed .reticle { transform: scale(1.25) rotate(45deg); }
