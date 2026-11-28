@@ -40,8 +40,8 @@ export const siteSections: readonly SiteSection[] = [
     label: "Explore",
     href: "/explore",
     title: "Explore",
-    blurb: "Articles and write-ups by ECE students on the ideas shaping electronics and communication.",
-    ready: false,
+    blurb: "Curated technical articles and industry insights in electronics, VLSI, embedded systems, and communication.",
+    ready: true,
   },
   {
     id: "events",
